@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Puan Tablosu - AFA Futbol Turnuvası{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+        <div class="card shadow-lg border-0">
+            <div class="card-header afa-header text-white text-center py-4">
+                <img src="{{ url_for('static', filename='img/afalogo.jpg') }}"
+                     alt="AFA Logo" class="mb-2 rounded-circle shadow" width="72" height="72"
+                     style="background:white;padding:4px;">
+                <h2 class="mb-0 fw-bold">
+                    <i class="bi bi-trophy-fill me-2"></i>
+                    AFA Futbol Turnuvası
+                </h2>
+                <div class="small opacity-75 mt-1">Puan Tablosu</div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm mb-0 tff-table">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th scope="col" class="text-center py-3">Sıra</th>
+                                <th scope="col" class="text-center">Takım</th>
+                                <th scope="col" class="text-center">O</th>
+                                <th scope="col" class="text-center">G</th>
+                                <th scope="col" class="text-center">B</th>
+                                <th scope="col" class="text-center">M</th>
+                                <th scope="col" class="text-center">AG</th>
+                                <th scope="col" class="text-center">YG</th>
+                                <th scope="col" class="text-center">AV</th>
+                                <th scope="col" class="text-center fw-bold">P</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in standings %}
+                            {% set idx = loop.index %}
+                            <tr class="{% if idx == 1 %}table-success leader-row{% elif idx > (standings|length - 4) %}table-danger relegation-row{% endif %} position-{{ idx }}">
+                                <td class="text-center fw-bold align-middle py-2 position-col">{{ idx }}</td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-primary me-2 position-badge">{{ idx }}</span>
+                                        {{ row.team.name }}
+                                    </div>
+                                </td>
+                                <td class="text-center align-middle">{{ row.played }}</td>
+                                <td class="text-center align-middle fw-semibold text-success">{{ row.wins }}</td>
+                                <td class="text-center align-middle">{{ row.draws }}</td>
+                                <td class="text-center align-middle fw-semibold text-danger">{{ row.losses }}</td>
+                                <td class="text-center align-middle">{{ row.gf }}</td>
+                                <td class="text-center align-middle">{{ row.ga }}</td>
+                                <td class="text-center align-middle {{ 'text-success fw-bold' if row.goal_diff > 0 else 'text-danger fw-bold' if row.goal_diff < 0 else '' }}">
+                                    {{ row.goal_diff }}
+                                </td>
+                                <td class="text-center align-middle fw-bold fs-5 points-col">{{ row.points }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-center border-0">
+                <small class="text-muted">
+                    Puanlama: Galibiyet 3 puan, Beraberlik 1 puan | Sıralama: Puan > İkili Averaj > Genel Averaj > Atılan Gol
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if recent %}
+<div class="row justify-content-center mt-5">
+    <div class="col-12 col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="afa-text mb-0">
+                <i class="bi bi-calendar-event me-2"></i>Son Maçlar
+            </h3>
+            <a href="{{ url_for('matches_list') }}" class="btn btn-sm btn-outline-dark">
+                Tümünü Gör <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        <div class="row g-3">
+            {% for match in recent %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="{{ url_for('match_detail', match_id=match.id) }}" class="text-decoration-none text-reset">
+                    <div class="card h-100 shadow-sm match-card">
+                        {% if match.photos %}
+                        <img src="{{ url_for('uploaded_file', filename='matches/' ~ match.id ~ '/thumb_' ~ match.photos[0].filename) }}"
+                             class="card-img-top" style="height:160px;object-fit:cover;" alt="">
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="small text-muted mb-2">{{ match.date.strftime('%d.%m.%Y') }}</div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <strong class="flex-grow-1 text-end pe-2 small">{{ match.team1.name }}</strong>
+                                <span class="badge bg-dark fs-6 px-3 py-1">
+                                    {{ match.team1_score }} - {{ match.team2_score }}
+                                </span>
+                                <strong class="flex-grow-1 ps-2 small">{{ match.team2.name }}</strong>
+                            </div>
+                            {% if match.photos %}
+                            <div class="mt-2 small text-muted text-center">
+                                <i class="bi bi-camera"></i> {{ match.photos|length }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

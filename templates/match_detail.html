@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ match.team1.name }} {{ match.team1_score }}-{{ match.team2_score }} {{ match.team2.name }} - AFA{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('matches_list') }}" class="btn btn-link text-muted mb-3">
+    <i class="bi bi-arrow-left"></i> Tüm Maçlar
+</a>
+
+<div class="card shadow-lg border-0 mb-4">
+    <div class="card-header afa-header text-white text-center py-4">
+        <div class="small opacity-75 mb-2">{{ match.date.strftime('%d %B %Y') }}</div>
+        <div class="row align-items-center">
+            <div class="col text-end">
+                <h3 class="mb-0 fw-bold">{{ match.team1.name }}</h3>
+            </div>
+            <div class="col-auto">
+                <div class="display-4 fw-bold">
+                    {{ match.team1_score }} <span class="opacity-50">-</span> {{ match.team2_score }}
+                </div>
+            </div>
+            <div class="col text-start">
+                <h3 class="mb-0 fw-bold">{{ match.team2.name }}</h3>
+            </div>
+        </div>
+    </div>
+    {% if match.notes %}
+    <div class="card-body">
+        <h6 class="text-muted text-uppercase small mb-2">Maç Notu</h6>
+        <p class="mb-0" style="white-space:pre-wrap">{{ match.notes }}</p>
+    </div>
+    {% endif %}
+</div>
+
+{% if match.photos %}
+<div class="card shadow-sm">
+    <div class="card-header afa-header-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-camera me-2"></i>Fotoğraflar ({{ match.photos|length }})</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% for photo in match.photos %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{{ url_for('uploaded_file', filename='matches/' ~ match.id ~ '/' ~ photo.filename) }}"
+                   data-bs-toggle="modal" data-bs-target="#photoModal"
+                   data-full="{{ url_for('uploaded_file', filename='matches/' ~ match.id ~ '/' ~ photo.filename) }}"
+                   data-caption="{{ photo.caption or '' }}">
+                    <img src="{{ url_for('uploaded_file', filename='matches/' ~ match.id ~ '/thumb_' ~ photo.filename) }}"
+                         class="img-fluid rounded shadow-sm photo-thumb"
+                         alt="{{ photo.caption or 'Maç fotoğrafı' }}"
+                         style="width:100%;height:180px;object-fit:cover;cursor:pointer;">
+                </a>
+                {% if photo.caption %}
+                <p class="small text-muted mt-1 text-truncate" title="{{ photo.caption }}">{{ photo.caption }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Photo Lightbox Modal -->
+<div class="modal fade" id="photoModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header border-0">
+                <h6 class="modal-title" id="photoModalCaption"></h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="photoModalImg" src="" class="img-fluid" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center text-muted py-4">
+        <i class="bi bi-camera-video-off" style="font-size:2rem"></i>
+        <p class="mb-0 mt-2">Bu maç için henüz fotoğraf eklenmedi.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

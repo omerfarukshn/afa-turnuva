@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Giriş - AFA Futbol Turnuvası{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <img src="{{ url_for('static', filename='img/afalogo.jpg') }}"
+                         alt="AFA" width="90" height="90" class="mb-3 rounded-circle shadow">
+                    <h3 class="fw-bold afa-text">Admin Paneli</h3>
+                    <p class="text-muted">Yönetim için giriş yapın</p>
+                </div>
+                
+                <form method="POST">
+                    <div class="mb-4">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person me-2"></i>Kullanıcı Adı
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="username" name="username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock me-2"></i>Şifre
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn afa-btn w-100 py-3 fw-bold">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Giriş Yap
+                    </button>
+                </form>
+                
+                <div class="alert alert-warning text-center mt-4 small">
+                    Varsayılan: <strong>kullanıcı: admin</strong> | <strong>şifre: admin123</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

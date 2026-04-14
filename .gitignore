@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Flask
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Upload'lar runtime'da volume'e gider, git'e sokulmaz
+static/uploads/
+uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Env
+.env
+.env.local
+
+# OS
+Thumbs.db

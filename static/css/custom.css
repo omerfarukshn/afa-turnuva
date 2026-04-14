@@ -1,0 +1,198 @@
+/* AFA Futbol Turnuvası - Tema
+   Palet: Kırmızı (Türk) + Siyah + Beyaz + Sarı (Alman) */
+:root {
+    --afa-red:       #C8102E;
+    --afa-red-dark:  #8B0A1F;
+    --afa-black:     #1A1A1A;
+    --afa-yellow:    #FFCE00;
+    --afa-gray:      #f3f4f6;
+    --afa-leader:    #157347;
+    --afa-leader-2:  #198754;
+    --afa-danger:    #ef4444;
+}
+
+/* Brand renk yardımcıları */
+.afa-text     { color: var(--afa-red) !important; }
+.afa-navbar   { background: linear-gradient(135deg, var(--afa-black) 0%, var(--afa-red-dark) 100%) !important; }
+.afa-header   { background: linear-gradient(135deg, var(--afa-red) 0%, var(--afa-red-dark) 100%) !important; }
+.afa-header-dark { background: linear-gradient(135deg, #333 0%, var(--afa-black) 100%) !important; }
+.afa-btn {
+    background: var(--afa-red);
+    color: white;
+    border: none;
+}
+.afa-btn:hover { background: var(--afa-red-dark); color: white; }
+
+/* Puan tablosu */
+.tff-table {
+    font-size: 0.95rem;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.tff-table th {
+    background: linear-gradient(135deg, var(--afa-black) 0%, #2a2a2a 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    padding: 1rem 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tff-table td {
+    padding: 0.85rem 0.75rem;
+    border-color: #e5e7eb;
+    vertical-align: middle;
+    transition: background-color 0.15s ease;
+}
+
+.tff-table tbody tr {
+    background: white;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.tff-table tbody tr:hover {
+    background-color: #fff8f8;
+}
+
+/* Lider — Yeşil (şampiyonluk) */
+.leader-row {
+    background: linear-gradient(90deg, var(--afa-leader) 0%, var(--afa-leader-2) 100%) !important;
+    color: white !important;
+    box-shadow: inset 4px 0 0 var(--afa-yellow);
+}
+
+.leader-row td { color: white !important; }
+.leader-row .text-success,
+.leader-row .text-danger { color: white !important; }
+
+.leader-row .position-col,
+.leader-row .points-col {
+    background: rgba(255,255,255,0.15) !important;
+    color: white !important;
+}
+
+/* Düşme Hattı — Kırmızı (AFA kırmızısı uyumlu) */
+.relegation-row {
+    background-color: #fef2f2 !important;
+    border-left: 5px solid var(--afa-red);
+}
+
+.relegation-row:hover {
+    background-color: #fee2e2 !important;
+}
+
+/* Pozisyon badge */
+.position-badge {
+    min-width: 32px;
+    border-radius: 20px;
+    font-weight: 700;
+    background: var(--afa-red) !important;
+}
+
+.leader-row .position-badge {
+    background: var(--afa-yellow) !important;
+    color: var(--afa-black) !important;
+}
+
+/* Puan hücresi */
+.points-col {
+    font-size: 1.25rem !important;
+    min-width: 70px;
+}
+
+.leader-row .points-col {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tff-table {
+        font-size: 0.8rem;
+    }
+    .tff-table th,
+    .tff-table td {
+        padding: 0.6rem 0.4rem;
+    }
+    .points-col {
+        font-size: 1rem !important;
+    }
+}
+
+/* Admin formlar */
+.edit-match:hover {
+    transform: translateY(-1px);
+}
+
+#editModal input[type="number"] {
+    font-size: 2rem;
+    font-weight: 700;
+    border: 3px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+#editModal input[type="number"]:focus {
+    border-color: var(--afa-red);
+    box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
+}
+
+/* Loading spinner */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--afa-red);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Butonlar — Bootstrap primary'yi AFA kırmızısına override */
+.btn-primary {
+    background-color: var(--afa-red);
+    border-color: var(--afa-red);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--afa-red-dark);
+    border-color: var(--afa-red-dark);
+}
+.text-primary { color: var(--afa-red) !important; }
+
+/* Maç kartları */
+.match-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 1px solid #e5e7eb;
+}
+.match-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(200,16,46,0.15) !important;
+    border-color: var(--afa-red);
+}
+
+/* Fotoğraf kartı (admin) */
+.photo-card {
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.15s ease;
+}
+.photo-card:hover {
+    border-color: var(--afa-red);
+}
+
+/* Lightbox thumbnail hover */
+.photo-thumb {
+    transition: transform 0.2s ease;
+}
+.photo-thumb:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}

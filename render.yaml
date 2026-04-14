@@ -1,0 +1,27 @@
+# Render.com deploy konfigürasyonu
+# NOT: Ücretsiz plan persistent disk desteklemez → SQLite konteyner restart'ta silinir.
+# Seçenekler:
+#   1) Aşağıdaki gibi "starter" plan ($7/ay) + disk → SQLite kalıcı
+#   2) Ücretsiz plan + external Postgres (Neon.tech) → DB URL env var olarak ver
+#   3) Fly.io kullan (bkz. fly.toml) — tamamen ücretsiz + persistent disk
+
+services:
+  - type: web
+    name: afa-turnuva
+    runtime: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: TFF_SECRET_KEY
+        generateValue: true
+      - key: TFF_ADMIN_USER
+        value: admin
+      - key: TFF_ADMIN_PASS
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+    disk:
+      name: afa-data
+      mountPath: /opt/render/project/src/instance
+      sizeGB: 1

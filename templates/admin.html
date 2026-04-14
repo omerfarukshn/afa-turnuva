@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Paneli - AFA Futbol Turnuvası{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="afa-text"><i class="bi bi-gear-wide-connected me-2"></i>AFA Turnuva Yönetimi</h2>
+    <form method="POST" action="{{ url_for('admin_logout') }}" class="d-inline">
+        <button type="submit" class="btn btn-outline-danger">
+            <i class="bi bi-box-arrow-right"></i> Çıkış
+        </button>
+    </form>
+</div>
+
+<!-- Takım Yönetimi -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header afa-header text-white">
+        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Takım Yönetimi ({{ teams|length }})</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('team_add') }}" class="row g-3 mb-3">
+            <div class="col-md-8">
+                <input type="text" name="team_name" class="form-control" placeholder="Yeni takım adı girin..." required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn afa-btn w-100">
+                    <i class="bi bi-plus-circle"></i> Takım Ekle
+                </button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:60px">#</th>
+                        <th>Takım Adı</th>
+                        <th style="width:100px;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in teams %}
+                    <tr>
+                        <td>{{ team.id }}</td>
+                        <td><strong>{{ team.name }}</strong></td>
+                        <td>
+                            <form method="POST" action="{{ url_for('team_delete', team_id=team.id) }}" class="d-inline"
+                                  onsubmit="return confirm('{{ team.name }} takımı ve TÜM maçları/fotoğrafları silinecek. Emin misiniz?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="text-center text-muted py-3">Henüz takım eklenmedi.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Yeni Maç Ekle -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header afa-header-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-plus-square me-2"></i>Yeni Maç Ekle</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('match_add') }}" class="row g-3">
+            <div class="col-md-3">
+                <select name="team1" class="form-select" required>
+                    <option value="">Takım 1</option>
+                    {% for team in teams %}
+                    <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="team1_score" class="form-control text-center" min="0" placeholder="0" required>
+            </div>
+            <div class="col-auto d-flex align-items-center fs-4 fw-bold text-dark">-</div>
+            <div class="col-md-2">
+                <input type="number" name="team2_score" class="form-control text-center" min="0" placeholder="0" required>
+            </div>
+            <div class="col-md-3">
+                <select name="team2" class="form-select" required>
+                    <option value="">Takım 2</option>
+                    {% for team in teams %}
+                    <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn afa-btn w-100" title="Maçı kaydet ve fotoğraf yüklemeye geç">
+                    <i class="bi bi-check-lg"></i>
+                </button>
+            </div>
+        </form>
+        <small class="text-muted d-block mt-2">
+            <i class="bi bi-info-circle"></i> Maç eklendikten sonra ayrıntı sayfasında fotoğraf yükleyebilirsiniz.
+        </small>
+    </div>
+</div>
+
+<!-- Mevcut Maçlar -->
+<div class="card shadow-sm">
+    <div class="card-header afa-header-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Tüm Maçlar ({{ matches|length }})</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Maç</th>
+                        <th class="text-center">Skor</th>
+                        <th class="text-center"><i class="bi bi-camera"></i></th>
+                        <th style="width:180px">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in matches %}
+                    <tr>
+                        <td class="small text-muted">{{ match.date.strftime('%d.%m.%Y') }}</td>
+                        <td>
+                            <strong>{{ match.team1.name }}</strong> - <strong>{{ match.team2.name }}</strong>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-dark fs-6 px-3 py-2">
+                                {{ match.team1_score }} - {{ match.team2_score }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            {% set n = match.photos|length %}
+                            {% if n > 0 %}
+                                <span class="badge bg-success">{{ n }}</span>
+                            {% else %}
+                                <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_match', match_id=match.id) }}"
+                               class="btn btn-sm afa-btn me-1">
+                                <i class="bi bi-pencil-square"></i> Yönet
+                            </a>
+                            <form method="POST" action="{{ url_for('match_delete', match_id=match.id) }}" class="d-inline"
+                                  onsubmit="return confirm('Maç ve TÜM fotoğrafları silinecek. Emin misiniz?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">Henüz maç eklenmedi.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Maç Yönetimi - {{ match.team1.name }} vs {{ match.team2.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="afa-text mb-0">
+        <i class="bi bi-pencil-square me-2"></i>Maç Yönetimi
+    </h2>
+    <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Tüm Maçlar
+    </a>
+</div>
+
+<!-- Skor & Notlar -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header afa-header text-white">
+        <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Skor & Notlar</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('match_update', match_id=match.id) }}">
+            <div class="row align-items-center g-3 mb-3">
+                <div class="col text-end">
+                    <h4 class="mb-0">{{ match.team1.name }}</h4>
+                </div>
+                <div class="col-auto" style="width:100px">
+                    <input type="number" name="team1_score" class="form-control form-control-lg text-center fs-3"
+                           min="0" max="99" value="{{ match.team1_score }}" required>
+                </div>
+                <div class="col-auto fs-2 fw-bold">-</div>
+                <div class="col-auto" style="width:100px">
+                    <input type="number" name="team2_score" class="form-control form-control-lg text-center fs-3"
+                           min="0" max="99" value="{{ match.team2_score }}" required>
+                </div>
+                <div class="col">
+                    <h4 class="mb-0">{{ match.team2.name }}</h4>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted small">Maç Notları (opsiyonel, public sayfada görünür)</label>
+                <textarea name="notes" class="form-control" rows="3"
+                          placeholder="Örn. Oyuncu of-the-match, hakem, hava durumu, gol dakikaları...">{{ match.notes or '' }}</textarea>
+            </div>
+            <button type="submit" class="btn afa-btn">
+                <i class="bi bi-check-lg"></i> Kaydet
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Fotoğraf Yükleme -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header afa-header-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-camera me-2"></i>Fotoğraflar ({{ match.photos|length }} / {{ max_photos }})</h5>
+    </div>
+    <div class="card-body">
+        {% if match.photos|length < max_photos %}
+        <form method="POST" action="{{ url_for('photo_upload', match_id=match.id) }}"
+              enctype="multipart/form-data" class="mb-4">
+            <div class="mb-3">
+                <label class="form-label">Fotoğraf(lar) Seç</label>
+                <input type="file" name="photos" class="form-control"
+                       accept=".jpg,.jpeg,.png,.webp,.heic,image/*" multiple required>
+                <small class="text-muted">Birden fazla seçebilirsin. Maks 16 MB/dosya, JPG/PNG/WEBP/HEIC.</small>
+            </div>
+            <div class="mb-3">
+                <input type="text" name="caption" class="form-control" maxlength="250"
+                       placeholder="Açıklama (opsiyonel — tüm seçilen fotoğraflar için)">
+            </div>
+            <button type="submit" class="btn afa-btn">
+                <i class="bi bi-upload"></i> Yükle
+            </button>
+        </form>
+        {% else %}
+        <div class="alert alert-warning mb-4">
+            <i class="bi bi-exclamation-triangle"></i>
+            Bu maç için fotoğraf limitine ({{ max_photos }}) ulaşıldı. Yeni yüklemek için önce eskileri silin.
+        </div>
+        {% endif %}
+
+        {% if match.photos %}
+        <div class="row g-3">
+            {% for photo in match.photos %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card h-100 photo-card">
+                    <a href="{{ url_for('uploaded_file', filename='matches/' ~ match.id ~ '/' ~ photo.filename) }}"
+                       target="_blank">
+                        <img src="{{ url_for('uploaded_file', filename='matches/' ~ match.id ~ '/thumb_' ~ photo.filename) }}"
+                             class="card-img-top" alt="{{ photo.caption or 'Maç fotoğrafı' }}"
+                             style="height:180px;object-fit:cover;">
+                    </a>
+                    <div class="card-body p-2">
+                        {% if photo.caption %}
+                        <p class="small mb-2 text-truncate" title="{{ photo.caption }}">{{ photo.caption }}</p>
+                        {% endif %}
+                        <form method="POST" action="{{ url_for('photo_delete', photo_id=photo.id) }}"
+                              onsubmit="return confirm('Fotoğraf silinsin mi?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                <i class="bi bi-trash"></i> Sil
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4 mb-0">Henüz fotoğraf yok.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Önizleme -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+        <a href="{{ url_for('match_detail', match_id=match.id) }}" target="_blank"
+           class="btn btn-outline-primary">
+            <i class="bi bi-eye"></i> Public Sayfayı Önizle
+        </a>
+    </div>
+</div>
+{% endblock %}
