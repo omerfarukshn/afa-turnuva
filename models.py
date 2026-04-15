@@ -57,6 +57,22 @@ class Match(db.Model):
         return f'<Match {self.team1.name} vs {self.team2.name}>'
 
 
+class Scorer(db.Model):
+    """Gol krallığı — turnuva geneli. Admin manuel gol sayısını günceller."""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    goals = db.Column(db.Integer, default=0, nullable=False)
+    team_id = db.Column(
+        db.Integer,
+        db.ForeignKey('team.id', ondelete='SET NULL'),
+        nullable=True
+    )
+    team = db.relationship('Team')
+
+    def __repr__(self):
+        return f'<Scorer {self.name} ({self.goals})>'
+
+
 class MatchPhoto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(

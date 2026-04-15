@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageOps
 
-from models import db, Team, Match, MatchPhoto, calculate_standings
+from models import db, Team, Match, MatchPhoto, Scorer, calculate_standings
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('TFF_SECRET_KEY', 'afa-turnuva-dev-secret')
@@ -132,6 +132,12 @@ def match_detail(match_id):
     return render_template('match_detail.html', match=match)
 
 
+@app.route('/gol-krallari')
+def top_scorers():
+    scorers = Scorer.query.order_by(Scorer.goals.desc(), Scorer.name.asc()).all()
+    return render_template('scorers.html', scorers=scorers)
+
+
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     """Serve uploaded images from persistent dir."""
@@ -168,7 +174,55 @@ def admin_logout():
 def admin():
     teams = Team.query.order_by(Team.name).all()
     matches = Match.query.order_by(Match.date.desc()).all()
-    return render_template('admin.html', teams=teams, matches=matches)
+    scorers = Scorer.query.order_by(Scorer.goals.desc(), Scorer.name.asc()).all()
+    return render_template('admin.html', teams=teams, matches=matches, scorers=scorers)
+
+
+# ---------- Admin: Scorers (gol krallığı) ----------
+
+@app.route('/admin/scorer_add', methods=['POST'])
+@login_required
+def scorer_add():
+    name = request.form.get('name', '').strip()[:100]
+    try:
+        goals = max(0, int(request.form.get('goals') or 0))
+    except (TypeError, ValueError):
+        goals = 0
+    team_id = request.form.get('team_id')
+    team_id = int(team_id) if team_id and team_id.isdigit() else None
+    if not name:
+        flash('Oyuncu adı boş olamaz!')
+        return redirect(url_for('admin'))
+    db.session.add(Scorer(name=name, goals=goals, team_id=team_id))
+    db.session.commit()
+    flash(f'{name} eklendi ({goals} gol).')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/scorer_update/<int:scorer_id>', methods=['POST'])
+@login_required
+def scorer_update(scorer_id):
+    s = Scorer.query.get_or_404(scorer_id)
+    s.name = (request.form.get('name', '').strip() or s.name)[:100]
+    try:
+        s.goals = max(0, int(request.form.get('goals') or 0))
+    except (TypeError, ValueError):
+        pass
+    tid = request.form.get('team_id')
+    s.team_id = int(tid) if tid and tid.isdigit() else None
+    db.session.commit()
+    flash('Oyuncu güncellendi.')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/scorer_delete/<int:scorer_id>', methods=['POST'])
+@login_required
+def scorer_delete(scorer_id):
+    s = Scorer.query.get_or_404(scorer_id)
+    db.session.delete(s)
+    db.session.commit()
+    flash('Oyuncu silindi.')
+    return redirect(url_for('admin'))
 
 
 @app.route('/admin/team_add', methods=['POST'])

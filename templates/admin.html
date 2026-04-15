@@ -61,6 +61,89 @@
     </div>
 </div>
 
+<!-- Gol Krallığı -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header afa-header-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Gol Krallığı ({{ scorers|length }})</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('scorer_add') }}" class="row g-2 mb-3">
+            <div class="col-md-4">
+                <input type="text" name="name" class="form-control" placeholder="Oyuncu adı" required>
+            </div>
+            <div class="col-md-4">
+                <select name="team_id" class="form-select">
+                    <option value="">— Takım (opsiyonel) —</option>
+                    {% for team in teams %}
+                    <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="goals" class="form-control text-center" min="0" value="0" placeholder="Gol" required>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn afa-btn w-100">
+                    <i class="bi bi-plus-circle"></i> Ekle
+                </button>
+            </div>
+        </form>
+
+        {% if scorers %}
+        <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:50px">#</th>
+                        <th>Oyuncu</th>
+                        <th style="width:30%">Takım</th>
+                        <th style="width:120px">Gol</th>
+                        <th style="width:130px">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in scorers %}
+                    <tr>
+                        <td class="fw-bold">{{ loop.index }}</td>
+                        <td>
+                            <input type="text" name="name" value="{{ s.name }}" class="form-control form-control-sm"
+                                   form="scorer-form-{{ s.id }}" required>
+                        </td>
+                        <td>
+                            <select name="team_id" class="form-select form-select-sm" form="scorer-form-{{ s.id }}">
+                                <option value="">—</option>
+                                {% for team in teams %}
+                                <option value="{{ team.id }}" {% if s.team_id == team.id %}selected{% endif %}>{{ team.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="goals" value="{{ s.goals }}" min="0"
+                                   class="form-control form-control-sm text-center" form="scorer-form-{{ s.id }}">
+                        </td>
+                        <td class="d-flex gap-1">
+                            <form id="scorer-form-{{ s.id }}" method="POST"
+                                  action="{{ url_for('scorer_update', scorer_id=s.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Kaydet">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('scorer_delete', scorer_id=s.id) }}" class="d-inline"
+                                  onsubmit="return confirm('{{ s.name }} silinecek. Emin misiniz?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Sil">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 <!-- Yeni Maç Ekle -->
 <div class="card shadow-sm mb-4">
     <div class="card-header afa-header-dark text-white">
