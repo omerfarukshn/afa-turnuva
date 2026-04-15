@@ -61,18 +61,21 @@
 
 /* Lider — Yeşil (şampiyonluk) */
 .leader-row {
-    background: linear-gradient(90deg, var(--afa-leader) 0%, var(--afa-leader-2) 100%) !important;
-    color: white !important;
     box-shadow: inset 4px 0 0 var(--afa-yellow);
 }
 
-.leader-row td { color: white !important; }
+.leader-row td {
+    background-color: var(--afa-leader-2) !important;
+    color: white !important;
+}
+.leader-row td:first-child {
+    background-color: var(--afa-leader) !important;
+}
 .leader-row .text-success,
 .leader-row .text-danger { color: white !important; }
 
-.leader-row .position-col,
 .leader-row .points-col {
-    background: rgba(255,255,255,0.15) !important;
+    background-color: var(--afa-leader) !important;
     color: white !important;
 }
 
