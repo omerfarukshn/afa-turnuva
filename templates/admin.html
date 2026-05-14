@@ -35,18 +35,39 @@
                     <tr>
                         <th style="width:60px">#</th>
                         <th>Takım Adı</th>
-                        <th style="width:100px;">İşlem</th>
+                        <th style="width:220px;">İşlem</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for team in teams %}
                     <tr>
                         <td>{{ team.id }}</td>
-                        <td><strong>{{ team.name }}</strong></td>
                         <td>
+                            <span id="team-name-{{ team.id }}"><strong>{{ team.name }}</strong></span>
+                            <form id="team-edit-form-{{ team.id }}"
+                                  method="POST" action="{{ url_for('team_update', team_id=team.id) }}"
+                                  class="d-none">
+                                <input type="text" name="team_name" value="{{ team.name }}"
+                                       class="form-control form-control-sm d-inline-block"
+                                       style="width:auto;min-width:150px;" required>
+                                <button type="submit" class="btn btn-sm btn-success ms-1">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary ms-1"
+                                        onclick="cancelEdit({{ team.id }})">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary me-1"
+                                    onclick="startEdit({{ team.id }})" id="edit-btn-{{ team.id }}"
+                                    title="Adı Düzenle">
+                                <i class="bi bi-pencil"></i>
+                            </button>
                             <form method="POST" action="{{ url_for('team_delete', team_id=team.id) }}" class="d-inline"
                                   onsubmit="return confirm('{{ team.name }} takımı ve TÜM maçları/fotoğrafları silinecek. Emin misiniz?')">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Sil">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -90,8 +111,12 @@
         </form>
 
         {% if scorers %}
+        <div class="mb-3">
+            <input type="text" id="scorer-filter" class="form-control form-control-sm"
+                   placeholder="Takım adına göre filtrele..." style="max-width:300px;">
+        </div>
         <div class="table-responsive">
-            <table class="table table-hover table-sm align-middle">
+            <table class="table table-hover table-sm align-middle" id="scorer-table">
                 <thead class="table-light">
                     <tr>
                         <th style="width:50px">#</th>
@@ -103,7 +128,7 @@
                 </thead>
                 <tbody>
                     {% for s in scorers %}
-                    <tr>
+                    <tr data-team="{{ s.team.name if s.team else '' }}">
                         <td class="fw-bold">{{ loop.index }}</td>
                         <td>
                             <input type="text" name="name" value="{{ s.name }}" class="form-control form-control-sm"
@@ -244,4 +269,32 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function startEdit(teamId) {
+    document.getElementById('team-name-' + teamId).classList.add('d-none');
+    document.getElementById('team-edit-form-' + teamId).classList.remove('d-none');
+    document.getElementById('edit-btn-' + teamId).classList.add('d-none');
+    document.querySelector('#team-edit-form-' + teamId + ' input').focus();
+}
+function cancelEdit(teamId) {
+    document.getElementById('team-name-' + teamId).classList.remove('d-none');
+    document.getElementById('team-edit-form-' + teamId).classList.add('d-none');
+    document.getElementById('edit-btn-' + teamId).classList.remove('d-none');
+}
+
+// Gol krallığı takım filtresi
+const scorerFilter = document.getElementById('scorer-filter');
+if (scorerFilter) {
+    scorerFilter.addEventListener('input', function () {
+        const q = this.value.trim().toLowerCase();
+        document.querySelectorAll('#scorer-table tbody tr').forEach(function (row) {
+            const teamName = row.dataset.team.toLowerCase();
+            row.style.display = (!q || teamName.includes(q)) ? '' : 'none';
+        });
+    });
+}
+</script>
 {% endblock %}

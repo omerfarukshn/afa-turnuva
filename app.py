@@ -238,6 +238,24 @@ def team_add():
     return redirect(url_for('admin'))
 
 
+@app.route('/admin/team_update/<int:team_id>', methods=['POST'])
+@login_required
+def team_update(team_id):
+    team = Team.query.get_or_404(team_id)
+    new_name = request.form.get('team_name', '').strip()
+    if not new_name:
+        flash('Takım adı boş olamaz!')
+        return redirect(url_for('admin'))
+    existing = Team.query.filter_by(name=new_name).first()
+    if existing and existing.id != team_id:
+        flash(f'"{new_name}" adında başka bir takım zaten var!')
+        return redirect(url_for('admin'))
+    team.name = new_name
+    db.session.commit()
+    flash(f'Takım adı "{new_name}" olarak güncellendi.')
+    return redirect(url_for('admin'))
+
+
 @app.route('/admin/team_delete/<int:team_id>', methods=['POST'])
 @login_required
 def team_delete(team_id):
