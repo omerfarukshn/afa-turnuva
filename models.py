@@ -123,21 +123,9 @@ def _head_to_head_stats(team_ids, all_matches):
     return result
 
 
-def _make_sort_key(r, h2h):
-    tid = r['team_id']
-    h = h2h[tid]
-    return (
-        -h['points'],
-        -h['goal_diff'],
-        -h['gf'],
-        -r['goal_diff'],
-        -r['gf'],
-    )
-
-
 def calculate_standings():
     """
-    TFF kuralları: puan > ikili averaj puanı > ikili averaj > ikili gol > genel averaj > genel gol
+    Sıralama: puan > genel averaj > atılan gol
     """
     teams = Team.query.all()
     all_matches = Match.query.all()
@@ -151,24 +139,6 @@ def calculate_standings():
         s['team_id'] = t.id
         rows.append(s)
 
-    # Önce puan > genel averaj > genel gol ile sırala
     rows.sort(key=lambda r: (-r['points'], -r['goal_diff'], -r['gf']))
 
-    final = []
-    i = 0
-    while i < len(rows):
-        j = i
-        while j + 1 < len(rows) and rows[j + 1]['points'] == rows[i]['points']:
-            j += 1
-
-        group = rows[i:j + 1]
-        if len(group) == 1:
-            final.extend(group)
-        else:
-            ids = [r['team_id'] for r in group]
-            h2h = _head_to_head_stats(ids, all_matches)
-            group.sort(key=lambda r: _make_sort_key(r, h2h))
-            final.extend(group)
-        i = j + 1
-
-    return final
+    return rows
