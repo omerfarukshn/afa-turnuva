@@ -123,6 +123,18 @@ def _head_to_head_stats(team_ids, all_matches):
     return result
 
 
+def _make_sort_key(r, h2h):
+    tid = r['team_id']
+    h = h2h[tid]
+    return (
+        -h['points'],
+        -h['goal_diff'],
+        -h['gf'],
+        -r['goal_diff'],
+        -r['gf'],
+    )
+
+
 def calculate_standings():
     """
     TFF kuralları: puan > ikili averaj puanı > ikili averaj > ikili gol > genel averaj > genel gol
@@ -139,7 +151,7 @@ def calculate_standings():
         s['team_id'] = t.id
         rows.append(s)
 
-    # Önce puan > genel averaj > genel gol ile sırala (h2h öncesi temel düzen)
+    # Önce puan > genel averaj > genel gol ile sırala
     rows.sort(key=lambda r: (-r['points'], -r['goal_diff'], -r['gf']))
 
     final = []
@@ -155,24 +167,7 @@ def calculate_standings():
         else:
             ids = [r['team_id'] for r in group]
             h2h = _head_to_head_stats(ids, all_matches)
-
-            # İkili maç oynanmışsa h2h önce, oynanmamışsa genel averaj belirleyici
-            def sort_key(r):
-                tid = r['team_id']
-                h = h2h[tid]
-                # h2h played > 0 ise h2h geçerli, yoksa 0 kabul et
-                h2h_points = h['points'] if h['played'] > 0 else 0
-                h2h_gd = h['goal_diff'] if h['played'] > 0 else 0
-                h2h_gf = h['gf'] if h['played'] > 0 else 0
-                return (
-                    -h2h_points,
-                    -h2h_gd,
-                    -h2h_gf,
-                    -r['goal_diff'],   # genel averaj
-                    -r['gf'],          # genel atılan gol
-                )
-
-            group.sort(key=sort_key)
+            group.sort(key=lambda r: _make_sort_key(r, h2h))
             final.extend(group)
         i = j + 1
 
