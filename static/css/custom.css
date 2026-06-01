@@ -23,6 +23,44 @@
 }
 .afa-btn:hover { background: var(--afa-red-dark); color: white; }
 
+.afa-navbar .navbar-brand {
+    min-width: 0;
+}
+
+.afa-navbar .nav-link {
+    white-space: nowrap;
+}
+
+.afa-youtube-link {
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    color: white !important;
+    padding: 0.35rem 0.7rem !important;
+    background: rgba(255,255,255,0.08);
+}
+
+.afa-youtube-link:hover,
+.afa-youtube-link:focus {
+    background: #ff0000;
+    border-color: #ff0000;
+    color: white !important;
+}
+
+.designer-credit {
+    opacity: 0.55;
+}
+
+.designer-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.designer-link:hover,
+.designer-link:focus {
+    color: var(--afa-red);
+    text-decoration: underline;
+}
+
 /* Puan tablosu */
 .tff-table {
     font-size: 0.95rem;
@@ -114,6 +152,23 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .afa-navbar .container {
+        gap: 0.5rem;
+    }
+    .afa-navbar .navbar-brand {
+        font-size: 1rem;
+    }
+    .afa-navbar .navbar-nav {
+        gap: 0.45rem !important;
+    }
+    .afa-navbar .nav-link {
+        font-size: 1.05rem;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+    .afa-youtube-link {
+        padding: 0.28rem 0.52rem !important;
+    }
     .tff-table {
         font-size: 0.8rem;
     }
